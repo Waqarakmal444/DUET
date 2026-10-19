@@ -475,6 +475,7 @@ class JointScheduler(Scheduler):
 
     def update(self, prompt_id, step, observed_reward, mean_response_length = None):
         self.difficulty_scheduler.update(prompt_id, step, observed_reward, mean_response_length)
+        self.length_scheduler.update(prompt_id, step, observed_reward, mean_response_length)
 
 
     def save_history(self, step: int) -> None:
