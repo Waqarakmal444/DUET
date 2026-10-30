@@ -1,0 +1,5 @@
+method,roc_auc,ci_lower,ci_upper,evaluation_type
+DifficultyOnly streak,0.6721026364565553,0.6297853713608542,0.711165686689711,offline_historical_evaluation
+Frozen history,0.7034799417055053,0.6711718327985607,0.7366474353455239,offline_historical_evaluation
+Bayesian diagnostic λ=1.0,0.7533383623746204,0.7171749184885328,0.784778066978067,offline_historical_evaluation
+Bayesian diagnostic λ=0.5,0.7512544075430729,0.7128972494865952,0.785575230214492,offline_historical_evaluation

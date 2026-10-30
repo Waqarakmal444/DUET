@@ -1,0 +1,24 @@
+{
+  "objective": "W10-D",
+  "status": "FIGURES_GENERATED",
+  "source_hashes": {
+    "week 8\\week8_mopps_bootstrap_summary.csv": "3a519540b4e1aaf8472b403de6a7dce0fd79b5efd8a5c24270e967ec0d65b5f0",
+    "week 8\\week8_budget_sweep.csv": "09b4e797caa865648d8e73a98363bd1ec92a1cc71908ed473e2f85b0efc2e398"
+  },
+  "figures": [
+    "C:\\Users\\waqar\\OneDrive\\Desktop\\Fellowship\\week 10\\publication_figures\\w10_roc_auc_comparison.pdf",
+    "C:\\Users\\waqar\\OneDrive\\Desktop\\Fellowship\\week 10\\publication_figures\\w10_roc_auc_comparison.png",
+    "C:\\Users\\waqar\\OneDrive\\Desktop\\Fellowship\\week 10\\publication_figures\\w10_matched_skip_budget.pdf",
+    "C:\\Users\\waqar\\OneDrive\\Desktop\\Fellowship\\week 10\\publication_figures\\w10_matched_skip_budget.png",
+    "C:\\Users\\waqar\\OneDrive\\Desktop\\Fellowship\\week 10\\publication_figures\\w10_predictor_advantage.pdf",
+    "C:\\Users\\waqar\\OneDrive\\Desktop\\Fellowship\\week 10\\publication_figures\\w10_predictor_advantage.png"
+  ],
+  "summary_table": "C:\\Users\\waqar\\OneDrive\\Desktop\\Fellowship\\week 10\\publication_figures\\w10_predictor_summary.csv",
+  "evaluation_observations": 1920,
+  "evaluation_prompt_count": 128,
+  "crossover_grid_budget_pct": 36.0,
+  "bootstrap_unit": "prompt",
+  "bootstrap_resamples": 1000,
+  "live_training_results": false,
+  "gpu_jobs_launched": false
+}
