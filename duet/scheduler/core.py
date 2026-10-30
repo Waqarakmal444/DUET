@@ -324,7 +324,11 @@ class DifficultyOnlyScheduler(Scheduler):
         print(f"INFO:[Selected Prompts]-> Easy prompts skipped {skip_easy_count}")
         print(f"INFO:[Selected Prompts]-> Hard prompts skipped {skip_hard_count}")
 
-        if not selected_indices:
+        # Preserve the historical nonempty fallback by default.
+        # Offline callers may explicitly request strict filtering.
+        allow_empty_batch = kwargs.get("allow_empty_batch", False)
+
+        if not selected_indices and not allow_empty_batch:
             min_size = min(batch_size, len(pool))
             selected_indices = [pt for pt in range(min_size)]
 

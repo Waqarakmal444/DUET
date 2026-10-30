@@ -80,7 +80,11 @@ def test_returns_empty_batch_when_every_prompt_is_skipped(
         lambda prompt, base_prob: False,
     )
 
-    selected = difficulty_scheduler.select_prompts(pool, batch_size=50)
+    selected = difficulty_scheduler.select_prompts(
+        pool,
+        batch_size=50,
+        allow_empty_batch=True,
+    )
 
     assert len(selected) == 0
     assert snapshot_reward_history(difficulty_scheduler) == before
@@ -114,3 +118,40 @@ def test_does_not_skip_unseen_prompts_after_skipping_seen_prompts(
 
     assert len(selected) == 5
     assert list(selected["prompt_id"]) == [f"train_{i}" for i in range(5, 10)]
+
+
+def test_default_fallback_preserves_nonempty_batch_when_all_skipped(
+    difficulty_scheduler,
+    monkeypatch,
+):
+    pool = make_prompt_pool(50)
+    add_reward_history(
+        difficulty_scheduler,
+        num_prompts=50,
+        reward=1.0,
+        history_length=20,
+    )
+
+    before = snapshot_reward_history(difficulty_scheduler)
+
+    monkeypatch.setattr(
+        difficulty_scheduler,
+        "_skip_easy_prompts",
+        lambda prompt, base_prob: True,
+    )
+    monkeypatch.setattr(
+        difficulty_scheduler,
+        "_skip_hard_prompts",
+        lambda prompt, base_prob: False,
+    )
+
+    selected = difficulty_scheduler.select_prompts(
+        pool,
+        batch_size=50,
+    )
+
+    assert len(selected) == 50
+    assert snapshot_reward_history(difficulty_scheduler) == before
+
+    assert difficulty_scheduler.last_stats.skipped_easy == 50
+    assert difficulty_scheduler.last_stats.skipped_hard == 0
