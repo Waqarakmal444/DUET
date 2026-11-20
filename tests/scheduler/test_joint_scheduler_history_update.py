@@ -93,3 +93,58 @@ def test_joint_scheduler_forwards_identical_observations():
         instance.difficulty_scheduler.history
         is not instance.length_scheduler.history
     )
+def test_joint_scheduler_resets_and_exposes_statistics():
+    """Regression test for the Week 9 last_stats NoneType crash."""
+    source = CORE_PATH.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    joint = next(
+        node for node in tree.body
+        if isinstance(node, ast.ClassDef)
+        and node.name == "JointScheduler"
+    )
+
+    reset_method = next(
+        node for node in joint.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "reset_stats"
+    )
+
+    module = ast.Module(body=[reset_method], type_ignores=[])
+    ast.fix_missing_locations(module)
+
+    namespace = {"__builtins__": {}}
+    exec(compile(module, str(CORE_PATH), "exec"), namespace)
+
+    class FakeStats:
+        def __init__(self):
+            self.considered = 0
+
+    class FakeDifficultyScheduler:
+        def __init__(self):
+            self.last_stats = FakeStats()
+
+        def reset_stats(self):
+            self.last_stats = FakeStats()
+
+    class Harness:
+        pass
+
+    instance = Harness()
+    instance.difficulty_scheduler = FakeDifficultyScheduler()
+    instance.last_stats = None
+
+    namespace["reset_stats"](instance)
+
+    assert instance.last_stats is not None
+    assert instance.last_stats is instance.difficulty_scheduler.last_stats
+    assert instance.last_stats.considered == 0
+
+    instance.difficulty_scheduler.last_stats.considered += 10
+
+    assert instance.last_stats.considered == 10
+
+    instance.last_stats.considered = 25
+    namespace["reset_stats"](instance)
+
+    assert instance.last_stats.considered == 0

@@ -463,11 +463,18 @@ class DifficultyOnlyScheduler(Scheduler):
 class JointScheduler(Scheduler):
     name: str = "joint"
 
+#    def __init__(self) -> None:
+ #       super().__init__()
+ #       self.difficulty_scheduler = DifficultyOnlyScheduler()
+ #       self.length_scheduler = LengthOnlyScheduler()
     def __init__(self) -> None:
         super().__init__()
         self.difficulty_scheduler = DifficultyOnlyScheduler()
         self.length_scheduler = LengthOnlyScheduler()
-
+        self.last_stats = self.difficulty_scheduler.last_stats
+    def reset_stats(self):
+        self.difficulty_scheduler.reset_stats()
+        self.last_stats = self.difficulty_scheduler.last_stats
     def select_prompts(self, pool, batch_size, **kwargs):
         return self.difficulty_scheduler.select_prompts(pool, batch_size, **kwargs)
 

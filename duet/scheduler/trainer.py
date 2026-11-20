@@ -35,6 +35,7 @@ class DuetPPOTrainerSync(PPOTrainerSync):
         self.num_workers: int = self.config.actor_rollout_ref.rollout.agent.num_workers or 8
         self.cumulative_total_tokens: int = 0
         self.cumulative_response_tokens: int = 0
+        self._last_token_accounted_step: int = -1
 
         self.interleave_schedulers: list[Scheduler] = []
         for s in self.config.trainer.duet.scheduler_options:
@@ -447,13 +448,13 @@ class DuetPPOTrainerSync(PPOTrainerSync):
 
             })
 
-        step_total_tokens = int(metrics.get("perf/total_num_tokens", 0) or 0)
-        step_response_tokens = int(metrics.get("duet/generated_response_tokens", 0) or 0)
-        self.cumulative_total_tokens += step_total_tokens
-        self.cumulative_response_tokens += step_response_tokens
-        metrics["duet/cumulative_total_tokens"] = self.cumulative_total_tokens
-        metrics["duet/cumulative_response_tokens"] = self.cumulative_response_tokens
-        metrics["duet/cumulative_optimizer_steps"] = self.global_steps
+     #    step_total_tokens = int(metrics.get("perf/total_num_tokens", 0) or 0)
+     #   step_response_tokens = int(metrics.get("duet/generated_response_tokens", 0) or 0)
+     #   self.cumulative_total_tokens += step_total_tokens
+     #   self.cumulative_response_tokens += step_response_tokens
+     #   metrics["duet/cumulative_total_tokens"] = self.cumulative_total_tokens
+     #   metrics["duet/cumulative_response_tokens"] = self.cumulative_response_tokens
+     #   metrics["duet/cumulative_optimizer_steps"] = self.global_steps
 
         return KVBatchMeta(partition_id=combined_partition_id, keys=combined_keys, tags=combined_tags)
 
@@ -485,6 +486,26 @@ class DuetPPOTrainerSync(PPOTrainerSync):
         except Exception as error:
             print("Saving generation times failed. See error below")
             print(f"Error: {str(error)}")
+
+        if (
+            global_steps != self._last_token_accounted_step
+            and "duet/generated_response_tokens" in metrics
+            and "perf/total_num_tokens" in metrics
+        ):
+            step_total_tokens = int(
+                metrics.get("perf/total_num_tokens", 0) or 0
+            )
+            step_response_tokens = int(
+                metrics.get("duet/generated_response_tokens", 0) or 0
+            )
+
+            self.cumulative_total_tokens += step_total_tokens
+            self.cumulative_response_tokens += step_response_tokens
+            self._last_token_accounted_step = global_steps
+
+        metrics["duet/cumulative_total_tokens"] = self.cumulative_total_tokens
+        metrics["duet/cumulative_response_tokens"] = self.cumulative_response_tokens
+        metrics["duet/cumulative_optimizer_steps"] = global_steps
 
     
 
